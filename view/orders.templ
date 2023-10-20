@@ -1,0 +1,73 @@
+package view
+
+import "github.com/marianozunino/go-scrap-challenge/internal/core/domain"
+import "fmt"
+
+templ Orders(orders []domain.Order, user string, page int, more bool ) {
+  @Logout(user)
+	<div class="overflow-x-auto">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>Usuario</th>
+					<th>Fecha</th>
+					<th>Detalles</th>
+				</tr>
+			</thead>
+			if len(orders) > 0 {
+				<tbody>
+					for _, item := range orders {
+						@OrderRow(item)
+					}
+				</tbody>
+			} else {
+				<tbody>
+					<tr>
+						<td colspan="5">No hay datos</td>
+					</tr>
+				</tbody>
+			}
+		</table>
+	</div>
+  @Pager(page, more)
+}
+
+templ OrderRow(order domain.Order) {
+	<tr>
+		<td>{ fmt.Sprintf("%d", order.ID) }</td>
+		<td>{ order.Buyer }</td>
+		<td>{ order.Date.Format("2006-01-02 15:04") }</td>
+		<th>
+			<a
+ 				class="btn btn-ghost btn-xs"
+ 				href={ templ.URL("/orders/" + fmt.Sprintf("%d", order.ID)+"/details") }
+			>
+				Detalles
+			</a>
+		</th>
+	</tr>
+}
+
+templ Pager(page int, more bool) {
+	<div class="flex justify-center">
+		<div class="btn-group">
+			if page > 1 {
+				<a class="btn btn-primary" href={ templ.URL("/orders?page=" + fmt.Sprintf("%d", page-1)) }>Anterior</a>
+			}
+			if more {
+				<a class="btn btn-primary" href={ templ.URL("/orders?page=" + fmt.Sprintf("%d", page+1)) }>Siguiente</a>
+			}
+		</div>
+	</div>
+}
+
+
+templ Logout(user string) {
+	<div class="flex justify-end mt-4">
+		<a class="btn btn-xs" href="/logout">
+			<span class="badge badge-success">{ user }</span>
+			Salir
+		</a>
+	</div>
+}
